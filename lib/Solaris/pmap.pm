@@ -7,7 +7,7 @@ use namespace::autoclean;
 use Log::Log4perl qw(:easy);
 
 has [ 'pid' ]             => ( is  => 'ro', isa => 'Num', required => 1, );
-has [ 'dynamic_symtab' ]  => ( is  => 'ro', isa => 'HashRef',
+has [ 'dynamic_symtab' ]  => ( is  => 'ro', isa => 'ArrayRef',
                                builder => '_build_dynamic_symtab' );
 
 sub _build_dynamic_symtab {
@@ -19,6 +19,7 @@ sub _build_dynamic_symtab {
                        \S+                       \s+ # perms
                        (/[^\n]+?\.so(?:[^\n]+|)) \n  # Full path to .so* file
                    }smx;
+  my ($dynamic_sym_offset_href,$dyn_symtab_aref);
 
   my @cmd = ( qq(/usr/bin/pmap), qq($self->pid) );
 
@@ -57,6 +58,7 @@ sub _build_dynamic_symtab {
     }
   }
 
+  return $dyn_symtab_aref;
 }
 
 
