@@ -2,4 +2,6 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.001     2014-01-17 15:48:34-05:00 America/New_York
+
   - First Release (completely empty, just to test publishing)
