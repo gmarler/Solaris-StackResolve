@@ -1,5 +1,7 @@
 package Solaris::pmap;
 
+use version 0.77; our $VERSION = version->declare("v0.0.1");
+
 use Moose;
 use Moose::Util::TypeConstraints;
 with 'MooseX::Log::Log4perl';
