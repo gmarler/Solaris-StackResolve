@@ -1,3 +1,5 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+  - First Release (completely empty, just to test publishing)
