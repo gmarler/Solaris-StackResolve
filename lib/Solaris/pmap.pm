@@ -1,12 +1,12 @@
 package Solaris::pmap;
 
-use version 0.77; our $VERSION = version->declare("v0.0.1");
-
 use Moose;
 use Moose::Util::TypeConstraints;
 with 'MooseX::Log::Log4perl';
 use namespace::autoclean;
 use Log::Log4perl qw(:easy);
+
+# VERSION
 
 has [ 'pid' ]             => ( is  => 'ro', isa => 'Num', required => 1, );
 has [ 'dynamic_symtab' ]  => ( is  => 'ro', isa => 'ArrayRef',
