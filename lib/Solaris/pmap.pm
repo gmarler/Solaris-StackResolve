@@ -21,7 +21,8 @@ sub _build_dynamic_symtab {
                        \S+                       \s+ # perms
                        (/[^\n]+?\.so(?:[^\n]+|)) \n  # Full path to .so* file
                    }smx;
-  my ($dynamic_sym_offset_href,$dyn_symtab_aref);
+  my ($dynamic_sym_offset_href) = { };
+  my ($dyn_symtab_aref)         = [ ];
 
   my @cmd = ( qq(/usr/bin/pmap), qq($self->pid) );
 
