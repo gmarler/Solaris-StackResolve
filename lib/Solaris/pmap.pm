@@ -9,8 +9,11 @@ use Log::Log4perl qw(:easy);
 # VERSION
 
 has [ 'pid' ]             => ( is  => 'ro', isa => 'Num', required => 1, );
+# Can't use builder here, because we must be sure the pid attribute has already
+# been set; so we use an after clause
 has [ 'dynamic_symtab' ]  => ( is  => 'ro', isa => 'ArrayRef',
-                               builder => '_build_dynamic_symtab' );
+                               builder => '_build_dynamic_symtab',
+                               lazy => 1, );
 
 sub _build_dynamic_symtab {
   my ($self) = shift;
@@ -24,7 +27,8 @@ sub _build_dynamic_symtab {
   my ($dynamic_sym_offset_href) = { };
   my ($dyn_symtab_aref)         = [ ];
 
-  my @cmd = ( qq(/usr/bin/pmap), qq($self->pid) );
+  my $pid = $self->pid;
+  my @cmd = ( qq(/usr/bin/pmap), qq($pid) );
 
   # TODO: There are times when the process is manipulating the address space
   #       so quickly that pmap can't grab the process - in those cases, we should
@@ -38,9 +42,9 @@ sub _build_dynamic_symtab {
       $dynamic_sym_offset_href->{$2} = hex($1);
     }
   }
-  
+ 
   foreach my $libpath (keys %$dynamic_sym_offset_href) {
-    print "Building symtab for $libpath\n";
+    warn "Building symtab for $libpath\n";
     my $base_addr = $dynamic_sym_offset_href->{$libpath};
     my @cmd       = ( q{/usr/ccs/bin/nm}, q{-C}, qq{$libpath} );
     my $out       = qx{@cmd};

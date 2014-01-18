@@ -3,8 +3,6 @@
 #
 package TF::Solaris::pmap;
 
-use Path::Class::File ();
-
 use Test::Class::Moose;
 with 'Test::Class::Moose::Role::AutoUse';
 
@@ -47,13 +45,23 @@ sub test_constructor {
   my ($test) = shift;
 
   # Because Solaris demands that you always run nscd, as it should.
-  my @pgrep_cmd = qw(/bin/pgrep nscd);
+  # And just in case there's more than one running... look at the newest
+  my @pgrep_cmd = qw(/bin/pgrep -n nscd);
 
   my ($nscd_pid) = qx{@pgrep_cmd}; chomp($nscd_pid);
 
   my $obj = $test->class_name->new(pid => $nscd_pid);
 
   isa_ok($obj, $test->class_name, 'Should create new object');
+
+  eq_or_diff($obj->pid, $nscd_pid, 'PID should match');
+
+  # TODO: Pass bogus PID
+  #       Ensure dynamic_symtab returns a value
+  #
+  # TODO: Skip this if not beign run by root, as it will fail
+  #       OR, expect this error and test for it.
+  my $dsymtab = $obj->dynamic_symtab;
 }
 
 
