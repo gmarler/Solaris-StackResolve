@@ -10,14 +10,7 @@ sub test_startup {
   my ($test) = shift;
 
   if ( ! -x q{/bin/uname} or ($^O ne "solaris")) {
-    $test->test_skip("These tests only run on Solaris");
-  }
-  my @uname_cmd = qw(/bin/uname -r);
-  my ($osrev) = qx{@uname_cmd}; chomp($osrev);
-  my ($osrev_maj,$osrev_min);
-  ($osrev_maj,$osrev_min) = $osrev =~ m{^([\d]+)\.([\d]+)$};
-  unless ($osrev_maj == 5 && $osrev_min >= 11) {
-    $test->test_skip("These tests only run on Solaris 11 and later");
+    $test->test_skip("These tests only valid on Solaris");
   }
 
   $test->next::method;
