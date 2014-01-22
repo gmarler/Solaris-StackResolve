@@ -16,8 +16,10 @@ use Log::Log4perl qw(:easy);
 
 # VERSION
 
+use autodie;
 use Storable;
 use Math::BigInt qw();
+use IO::File     qw();
 
 # The file containing the unresolved user stack traces
 has [ 'ustack_trace_file' ] => ( is => 'ro', isa => 'Str', required => 1);
@@ -34,9 +36,18 @@ has [ 'pmap_data' ]         => ( is => 'ro', isa => 'Solaris::pmap' );
 
 my $dynamic_sym_offset_href  = { };
 
-# Open the file containing ustack() data to resolve
-my $stack_fh = IO::File->new($ustack_trace_file, "<") or
-   die "unable to open stack trace file";
+sub _build_ustack_trace_fh {
+  my ($self) = shift;
+
+  my $file = $self->ustack_trace_file;
+  if ( not -f $file ) {
+    die "__PACKAGE__: $file does not exist";
+  }
+  my $fh = IO::File->new($file,"<") or
+    die "Unable to open $file";
+
+  $self->ustack_trace_fh($fh);
+}
 
 my ($symtab,$dyn_symtab,$symcache) = ([], [], []);
 
