@@ -30,6 +30,12 @@ has [ 'static_symtab'  ]    => ( is => 'ro', isa => 'HashRef' );
 has [ 'symtab'  ]           => ( is => 'ro', isa => 'HashRef' );
 has [ 'nm_data' ]           => ( is => 'ro', isa => 'Solaris::nm' );
 has [ 'pmap_data' ]         => ( is => 'ro', isa => 'Solaris::pmap' );
+# Statistics of use
+has [ 'cachehit' ]          => ( is => 'rw', isa => 'Num' );
+has [ 'cachemiss' ]         => ( is => 'rw', isa => 'Num' );
+has [ 'unresolved' ]        => ( is => 'rw', isa => 'Num' );
+has [ 'total_lookup' ]      => ( is => 'rw', isa => 'Num' );
+
 
 my $dynamic_sym_offset_href  = { };
 
@@ -111,7 +117,9 @@ while (my $line = <$stack_fh>) {
 sub report {
   my ($self) = shift;
 
-  # TODO: Look up $cachehit, $cachemiss, unresolved, and $total_lookup stats
+  my ($cachehit,$cachemiss,$unresolved,$total_lookup) =
+    ($self->cachehit,$self->cachemiss,$self->unresolved,$total_lookup);
+
   $self->logger->info("REPORT:");
   my ($hit_pct,$miss_pct,$unres_pct) =
      (sprintf("%4.1f",($cachehit/$total_lookup)*100.0),
