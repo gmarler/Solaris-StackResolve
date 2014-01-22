@@ -13,9 +13,6 @@ use Moose::Util::TypeConstraints;
 with 'MooseX::Log::Log4perl';
 use namespace::autoclean;
 use Log::Log4perl qw(:easy);
-
-# VERSION
-
 use autodie;
 use Storable;
 use Math::BigInt qw();
