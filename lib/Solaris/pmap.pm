@@ -44,7 +44,7 @@ sub _build_dynamic_symtab {
   }
  
   foreach my $libpath (keys %$dynamic_sym_offset_href) {
-    warn "Building symtab for $libpath\n";
+    #warn "Building symtab for $libpath\n";
     my $base_addr = $dynamic_sym_offset_href->{$libpath};
     my @cmd       = ( q{/usr/ccs/bin/nm}, q{-C}, qq{$libpath} );
     my $out       = qx{@cmd};
