@@ -108,15 +108,21 @@ while (my $line = <$stack_fh>) {
   print $line;
 }
 
-print "REPORT:\n";
-my ($hit_pct,$miss_pct,$unres_pct) =
-   (sprintf("%4.1f",($cachehit/$total_lookup)*100.0),
-    sprintf("%4.1f",($cachemiss/$total_lookup)*100.0),
-    sprintf("%4.1f",($unresolved/$total_lookup)*100.0));
-print "CACHE HITS:            $cachehit  ($hit_pct%)\n";
-print "CACHE MISSES:          $cachemiss  ($miss_pct%)\n";
-print "UNRESOLVED:            $unresolved   ($unres_pct%)\n";
-print "TOTAL LOOKUP ATTEMPTS: $total_lookup\n";
+sub report {
+  my ($self) = shift;
+
+  # TODO: Look up $cachehit, $cachemiss, unresolved, and $total_lookup stats
+  $self->logger->info("REPORT:");
+  my ($hit_pct,$miss_pct,$unres_pct) =
+     (sprintf("%4.1f",($cachehit/$total_lookup)*100.0),
+      sprintf("%4.1f",($cachemiss/$total_lookup)*100.0),
+      sprintf("%4.1f",($unresolved/$total_lookup)*100.0));
+
+  $self->logger->info("CACHE HITS:            $cachehit  ($hit_pct%)");
+  $self->logger->info("CACHE MISSES:          $cachemiss  ($miss_pct%)");
+  $self->logger->info("UNRESOLVED:            $unresolved   ($unres_pct%)");
+  $self->logger->info("TOTAL LOOKUP ATTEMPTS: $total_lookup");
+}
 
 sub _binarySearch
 {
@@ -143,8 +149,6 @@ sub _binarySearch
   }
   return; # undef
 }
-
-
 
 
 no Moose;
