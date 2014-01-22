@@ -82,14 +82,14 @@ while (my $line = <$stack_fh>) {
     my $dec_addr = Math::BigInt->from_hex($+{hexaddr});
 
     if (scalar(@$symcache) > 0) {
-      $index = binarySearch($dec_addr, $symcache);
+      $index = $self->_binarySearch($dec_addr, $symcache);
     }
 
     if ($index) {
       $symtab_entry = $symcache->[$index];
       $cachehit++;
     } else {
-      $index = binarySearch($dec_addr, $symtab);
+      $index = $self->_binarySearch($dec_addr, $symtab);
       if ($index) {
         $symtab_entry = $symtab->[$index];
         push @$symcache, $symtab_entry;
