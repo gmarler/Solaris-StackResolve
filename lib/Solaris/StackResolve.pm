@@ -1,12 +1,4 @@
 package Solaris::StackResolve;
-# ABSTRACT: Resolves user stacks for huge binaries on Solaris, gathered by DTrace
-# VERSION
-
-=head1
-
-This module works to resolve user stacks collected by DTrace.
-
-=cut
 
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -15,8 +7,17 @@ use namespace::autoclean;
 use Log::Log4perl qw(:easy);
 use autodie;
 use Storable;
-use Math::BigInt qw();
-use IO::File     qw();
+use Math::BigInt  qw();
+use IO::File      qw();
+
+# ABSTRACT: Resolves user stacks for huge binaries on Solaris, gathered by DTrace
+# VERSION
+
+=head1
+
+This module works to resolve user stacks collected by DTrace.
+
+=cut
 
 # The file containing the unresolved user stack traces
 has [ 'ustack_trace_file' ] => ( is => 'ro', isa => 'Str', required => 1);
@@ -114,11 +115,18 @@ while (my $line = <$stack_fh>) {
   print $line;
 }
 
+=head $ustack_res_obj->report()
+
+Produce a report concerning the efficiency/performance of the lookup process
+for this particular run.
+
+=cut
+
 sub report {
   my ($self) = shift;
 
   my ($cachehit,$cachemiss,$unresolved,$total_lookup) =
-    ($self->cachehit,$self->cachemiss,$self->unresolved,$total_lookup);
+    ($self->cachehit,$self->cachemiss,$self->unresolved,$self->total_lookup);
 
   $self->logger->info("REPORT:");
   my ($hit_pct,$miss_pct,$unres_pct) =
@@ -131,6 +139,13 @@ sub report {
   $self->logger->info("UNRESOLVED:            $unresolved   ($unres_pct%)");
   $self->logger->info("TOTAL LOOKUP ATTEMPTS: $total_lookup");
 }
+
+=head2 _binarySearch
+
+For userspace symbol lookups, does a correct binary search to place a raw
+address in userspace inside the range of some function.
+
+=cut
 
 sub _binarySearch
 {
