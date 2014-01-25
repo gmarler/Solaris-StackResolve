@@ -19,18 +19,26 @@ This module works to resolve user stacks collected by DTrace.
 
 =cut
 
+# PID we will be DTrace'ing and resolving the user stacks for
+has [ 'pid' ]               => ( is => 'ro', isa => 'Num', required => 1);
+# Location of 'hacked' DTrace binary that doesn't resolve ustack()'s
+has [ 'dtrace' ]            => ( is => 'ro', isa => 'Str', required => 1);
 # The file containing the unresolved user stack traces
-has [ 'ustack_trace_file' ] => ( is => 'ro', isa => 'Str', required => 1);
+has [ 'ustack_trace_file' ] => ( is => 'ro', isa => 'Str',
+                                 builder => '_build_ustack_trace_file',
+                                 lazy => 1, );
 # The filehandle for the above file
 has [ 'ustack_trace_fh' ]   => ( is => 'ro', isa => 'IO::File',
                                  builder => '_build_ustack_trace_fh',
                                  lazy => 1, );
-has [ 'dynamic_symtab'  ]   => ( is => 'ro', isa => 'HashRef' );
-has [ 'static_symtab'  ]    => ( is => 'ro', isa => 'HashRef' );
-# Combined dynamic + static symbol tables
-has [ 'symtab'  ]           => ( is => 'ro', isa => 'HashRef' );
+# Data from which dynamic/static symbol tables are extracted
+# TODO: make builders for these
 has [ 'nm_data' ]           => ( is => 'ro', isa => 'Solaris::nm' );
 has [ 'pmap_data' ]         => ( is => 'ro', isa => 'Solaris::pmap' );
+# Combined dynamic + static symbol tables
+has [ 'symtab'  ]           => ( is => 'ro', isa => 'HashRef' );
+has [ 'dynamic_symtab'  ]   => ( is => 'ro', isa => 'HashRef' );
+has [ 'static_symtab'  ]    => ( is => 'ro', isa => 'HashRef' );
 # Statistics of use
 has [ 'cachehit' ]          => ( is => 'rw', isa => 'Num' );
 has [ 'cachemiss' ]         => ( is => 'rw', isa => 'Num' );
@@ -93,7 +101,11 @@ Resolve all symbols to a "resolved" variant of the output file and exit.
 
 =cut
 
-my $dynamic_sym_offset_href  = { };
+sub _build_ustack_trace_file {
+  my ($self) = shift;
+
+  return "/tmp/junk_trace_file.out";
+}
 
 sub _build_ustack_trace_fh {
   my ($self) = shift;
