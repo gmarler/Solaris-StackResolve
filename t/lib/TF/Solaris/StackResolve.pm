@@ -37,7 +37,7 @@ sub test_startup {
 sub test_constructor {
   my ($test) = shift;
 
-  my $obj = $test->class_name->new(pid => $$);
+  my $obj = $test->class_name->new(pid => $$, dtrace => '/usr/sbin/dtrace');
 
   isa_ok($obj, $test->class_name, 'Should create new object');
 }
