@@ -40,6 +40,9 @@ sub test_constructor {
   my $obj = $test->class_name->new(pid => $$, dtrace => '/usr/sbin/dtrace');
 
   isa_ok($obj, $test->class_name, 'Should create new object');
+
+  cmp_ok($obj->pid, '==', $$, 'PID should match');
+  cmp_ok($obj->ustack_trace_file, 'eq', "/tmp/junk_trace_file.out", "User Stack Trace Filename");
 }
 
 
