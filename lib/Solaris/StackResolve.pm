@@ -37,6 +37,61 @@ has [ 'cachemiss' ]         => ( is => 'rw', isa => 'Num' );
 has [ 'unresolved' ]        => ( is => 'rw', isa => 'Num' );
 has [ 'total_lookup' ]      => ( is => 'rw', isa => 'Num' );
 
+=head1 DESCRIPTION
+
+Solaris::StackResolve is used for resolving the symbols for userspace stacks
+captured purposely unresolved from very large binaries (think > 500 MB in size).
+
+Such stacks are captured from DTrace's ustack() action, which normally will
+resolve the stacks to their symbols on the fly.  For very large binaries,
+this can take an extremely long time (minutes), so trying to capture several
+hundred stacks a second can prove to be an exercise in futility.
+
+Using a hacked version of libdtrace that doesn't resolve ustack() symbols at
+all, just providing numbers.
+
+So, this module automates the following steps, given a process PID to work on:
+
+=over
+
+=item
+
+Produce the name of the file to contain the unresolved user stacks
+
+=item
+
+Start the DTrace to gather the data into that file.
+
+=item
+
+Run a pmap via B<Solaris::pmap>
+
+This gets the list of dynamic symbols for the binary
+
+=item
+
+Run an nm via B<Solaris::nm>
+
+This gets a list of static symbols for the binary
+
+=item
+
+Produce a combined symbol lookup table
+
+=item
+
+Upon termination of the DTrace capture:
+
+Resolve all symbols to a "resolved" variant of the output file and exit.
+
+=back
+
+=cut
+
+
+=head1 METHODS
+
+=cut
 
 my $dynamic_sym_offset_href  = { };
 
@@ -115,7 +170,7 @@ while (my $line = <$stack_fh>) {
   print $line;
 }
 
-=head $ustack_res_obj->report()
+=head2 $ustack_res_obj->report()
 
 Produce a report concerning the efficiency/performance of the lookup process
 for this particular run.
