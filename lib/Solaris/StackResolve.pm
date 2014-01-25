@@ -120,67 +120,67 @@ sub _build_ustack_trace_fh {
   $self->ustack_trace_fh($fh);
 }
 
-my ($symtab,$dyn_symtab,$symcache) = ([], [], []);
-
-  # sort and merge both static and dynamic symbols into $symtab
-  @$symtab = sort {$a->[0] <=> $b->[0] } @$symtab, @$dyn_symtab;
-
-# Look for duplicates
-# TODO: Make this conditional
-#my %dups;
-#for (my $i = 0; $i < scalar(@$symtab); $i++) {
-#  $dups{$symtab->[$i]->[0]}++;
+#my ($symtab,$dyn_symtab,$symcache) = ([], [], []);
+#
+#  # sort and merge both static and dynamic symbols into $symtab
+#  @$symtab = sort {$a->[0] <=> $b->[0] } @$symtab, @$dyn_symtab;
+#
+## Look for duplicates
+## TODO: Make this conditional
+##my %dups;
+##for (my $i = 0; $i < scalar(@$symtab); $i++) {
+##  $dups{$symtab->[$i]->[0]}++;
+##}
+##foreach (sort { $dups{$a} <=> $dups{$b} } keys %dups) {
+##  print "$_: $dups{$_}\n";
+##}
+# 
+#
+#my ($total_lookup,$symtab_entry,$cachehit,$cachemiss,$unresolved);
+#
+#while (my $line = <$stack_fh>) {
+#  # Look up function name index - in cache first, if available
+#  my ($index);
+#  # symbol table entry pulled out of cache or full symbol table
+#  my ($symtab_entry);
+#
+#  # If the line is a hex address, then try to resolve it
+#  if ($line =~ m{0x(?<hexaddr>[\da-fA-F]+)}) {
+#    # convert hex address to BigInt decimal
+#    my $dec_addr = Math::BigInt->from_hex($+{hexaddr});
+#
+#    if (scalar(@$symcache) > 0) {
+#      $index = $self->_binarySearch($dec_addr, $symcache);
+#    }
+#
+#    if ($index) {
+#      $symtab_entry = $symcache->[$index];
+#      $cachehit++;
+#    } else {
+#      $index = $self->_binarySearch($dec_addr, $symtab);
+#      if ($index) {
+#        $symtab_entry = $symtab->[$index];
+#        push @$symcache, $symtab_entry;
+#        # Sort the cache
+#        @$symcache = sort {$a->[0] <=> $b->[0] } @$symcache;
+#        $cachemiss++;
+#      }
+#    }
+#
+#    # If we actually found the proper symbol table entry, make a pretty output
+#    # in the stack for it
+#    if ($symtab_entry) {
+#      my $funcname = $symtab_entry->[2];
+#      my $offset   = $symtab_entry->[1];
+#      my $resolved = sprintf("%s+0x%x",$funcname,$offset);
+#      $line =~ s{0x[\da-fA-F]+}{$resolved};
+#    } else {
+#      $unresolved++;
+#    }
+#    $total_lookup++;
+#  }
+#  print $line;
 #}
-#foreach (sort { $dups{$a} <=> $dups{$b} } keys %dups) {
-#  print "$_: $dups{$_}\n";
-#}
- 
-
-my ($total_lookup,$symtab_entry,$cachehit,$cachemiss,$unresolved);
-
-while (my $line = <$stack_fh>) {
-  # Look up function name index - in cache first, if available
-  my ($index);
-  # symbol table entry pulled out of cache or full symbol table
-  my ($symtab_entry);
-
-  # If the line is a hex address, then try to resolve it
-  if ($line =~ m{0x(?<hexaddr>[\da-fA-F]+)}) {
-    # convert hex address to BigInt decimal
-    my $dec_addr = Math::BigInt->from_hex($+{hexaddr});
-
-    if (scalar(@$symcache) > 0) {
-      $index = $self->_binarySearch($dec_addr, $symcache);
-    }
-
-    if ($index) {
-      $symtab_entry = $symcache->[$index];
-      $cachehit++;
-    } else {
-      $index = $self->_binarySearch($dec_addr, $symtab);
-      if ($index) {
-        $symtab_entry = $symtab->[$index];
-        push @$symcache, $symtab_entry;
-        # Sort the cache
-        @$symcache = sort {$a->[0] <=> $b->[0] } @$symcache;
-        $cachemiss++;
-      }
-    }
-
-    # If we actually found the proper symbol table entry, make a pretty output
-    # in the stack for it
-    if ($symtab_entry) {
-      my $funcname = $symtab_entry->[2];
-      my $offset   = $symtab_entry->[1];
-      my $resolved = sprintf("%s+0x%x",$funcname,$offset);
-      $line =~ s{0x[\da-fA-F]+}{$resolved};
-    } else {
-      $unresolved++;
-    }
-    $total_lookup++;
-  }
-  print $line;
-}
 
 =head2 $ustack_res_obj->report()
 
